@@ -1,4 +1,5 @@
 using EmployeeFlow.Data;
+using EmployeeFlow.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddScoped<EmployeeService>();
 
 builder.Services.AddControllers();
 

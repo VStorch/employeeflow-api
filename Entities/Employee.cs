@@ -8,5 +8,8 @@ namespace EmployeeFlow.Entities
 
         public int DepartmentId { get; set; }
         public Department Department { get; set; } = null!;
+
+        public int RoleId { get; set;}
+        public Role Role { get; set;} = null!;
     }
 }

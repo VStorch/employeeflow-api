@@ -8,6 +8,9 @@ namespace EmployeeFlow.Entities
 
         public RequestStatus Status { get; set; } = RequestStatus.Pending;
 
+        public int EmployeeId { get; set; }
+        public Employee Employee { get; set; } = null!;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

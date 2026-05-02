@@ -11,5 +11,7 @@ namespace EmployeeFlow.Entities
 
         public int RoleId { get; set;}
         public Role Role { get; set;} = null!;
+
+        public List<Request> Requests { get; set; } = new();
     }
 }

@@ -5,7 +5,7 @@ namespace EmployeeFlow.DTOs.Employees
         int Id,
         string Name,
         string Email,
-        int DepartmentId,
-        int RoleId
+        string Department,
+        string Role
     );
 }

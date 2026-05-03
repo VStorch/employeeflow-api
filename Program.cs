@@ -14,6 +14,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<EmployeeService>();
 
 builder.Services.AddControllers();

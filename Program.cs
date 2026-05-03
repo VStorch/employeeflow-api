@@ -13,6 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<CompanyService>();
+builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<EmployeeService>();
 
 builder.Services.AddControllers();

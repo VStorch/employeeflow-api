@@ -7,6 +7,7 @@ namespace EmployeeFlow.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
 
+        public DbSet<Company> Companies => Set<Company>();
         public DbSet<Employee> Employees => Set<Employee>();
         public DbSet<Department> Departments => Set<Department>();
         public DbSet<Role> Roles => Set<Role>();
@@ -30,6 +31,28 @@ namespace EmployeeFlow.Data
                 .HasOne(r => r.Employee)
                 .WithMany(e => e.Requests)
                 .HasForeignKey(r => r.EmployeeId);
+
+                modelBuilder.Entity<Employee>()
+                    .HasOne(e => e.Company)
+                    .WithMany(c => c.Employees)
+                    .HasForeignKey(e => e.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                modelBuilder.Entity<Department>()
+                    .HasOne(d => d.Company)
+                    .WithMany(c => c.Departments)
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                modelBuilder.Entity<Role>()
+                    .HasOne(r => r.Company)
+                    .WithMany(c => c.Roles)
+                    .HasForeignKey(r => r.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                modelBuilder.Entity<Employee>()
+                    .HasIndex(e => new { e.Email, e.CompanyId })
+                    .IsUnique();
         }
     }
 }

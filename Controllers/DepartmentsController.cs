@@ -18,15 +18,40 @@ namespace EmployeeFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateDepartmentRequest dto)
         {
-            var result = await _service.CreateAsync(dto);
-            return Ok(result);
+            var department = await _service.CreateAsync(dto);
+            return Ok(department);
         }
 
-        [HttpGet("company/{companyId}")]
-        public async Task<IActionResult> GetByCompany(int companyId)
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] int companyId)
         {
-            var result = await _service.GetByCompanyAsync(companyId);
-            return Ok(result);
+            var departments = await _service.GetByCompanyAsync(companyId);
+            return Ok(departments);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id, [FromQuery] int companyId)
+        {
+            var department = await _service.GetByIdAsync(id, companyId);
+
+            if (department is null)
+                return NotFound();
+
+            return Ok(department);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromQuery] int companyId, UpdateDepartmentRequest dto)
+        {
+            var updatedDepartment = await _service.UpdateAsync(id, companyId, dto);
+            return Ok(updatedDepartment);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id, [FromQuery] int companyId)
+        {
+            await _service.DeleteAsync(id, companyId);
+            return NoContent();
         }
     }
 }

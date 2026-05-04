@@ -44,19 +44,13 @@ namespace EmployeeFlow.Services
 
         private async Task EnsureCompanyExistsAsync(int companyId)
         {
-            var companyExists = await _context.Companies
-                .AnyAsync(c => c.Id == companyId);
-
-            if (!companyExists)
+            if (!await _context.Companies.AnyAsync(c => c.Id == companyId))
                 throw new Exception("Company not found");
         }
 
         private async Task EnsureRoleIsUniqueAsync(string name, int companyId)
         {
-            var alreadyExists = await _context.Roles
-                .AnyAsync(r => r.Name == name && r.CompanyId == companyId);
-
-            if (alreadyExists)
+            if (await _context.Roles.AnyAsync(r => r.Name == name && r.CompanyId == companyId))
                 throw new Exception("Role already exists in this company");
         }
     }

@@ -1,4 +1,5 @@
 using EmployeeFlow.Data;
+using EmployeeFlow.Middleware;
 using EmployeeFlow.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,10 @@ builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseGlobalExceptionHandler();
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

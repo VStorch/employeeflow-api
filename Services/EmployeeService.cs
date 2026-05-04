@@ -66,8 +66,6 @@ namespace EmployeeFlow.Services
         public async Task<EmployeeResponse> UpdateAsync(int id, int companyId, UpdateEmployeeRequest dto)
         {
             var employee = await _context.Employees
-                .Include(e => e.Department)
-                .Include(e => e.Role)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CompanyId == companyId);
 
             if (employee is null)

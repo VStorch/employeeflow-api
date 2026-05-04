@@ -16,17 +16,9 @@ namespace EmployeeFlow.Services
 
         public async Task<DepartmentResponse> CreateAsync(CreateDepartmentRequest dto)
         {
-            var companyExists = await _context.Companies
-                .AnyAsync(c => c.Id == dto.CompanyId);
+            await EnsureCompanyExistsAsync(dto.CompanyId);
 
-            if (!companyExists)
-                throw new Exception("Company not found");
-
-            var alreadyExists = await _context.Departments
-                .AnyAsync(d => d.Name == dto.Name && d.CompanyId == dto.CompanyId);
-
-            if (alreadyExists)
-                throw new Exception("Department already exists in this company");
+            await EnsureDepartmentIsUniqueAsync(dto.Name, dto.CompanyId);
 
             var department = new Department
             {
@@ -42,10 +34,30 @@ namespace EmployeeFlow.Services
 
         public async Task<List<DepartmentResponse>> GetByCompanyAsync(int companyId)
         {
+            await EnsureCompanyExistsAsync(companyId);
+
             return await _context.Departments
                 .Where(d => d.CompanyId == companyId)
                 .Select(d => new DepartmentResponse(d.Id, d.Name, d.CompanyId))
                 .ToListAsync();
+        }
+
+        private async Task EnsureCompanyExistsAsync(int companyId)
+        {
+            var companyExists = await _context.Companies
+                .AnyAsync(c => c.Id == companyId);
+
+            if (!companyExists)
+                throw new Exception("Company not found");
+        }
+
+        private async Task EnsureDepartmentIsUniqueAsync(string name, int companyId)
+        {
+            var alreadyExists = await _context.Departments
+                .AnyAsync(d => d.Name == name && d.CompanyId == companyId);
+
+            if (alreadyExists)
+                throw new Exception("Department already exists in this company");
         }
     }
 }

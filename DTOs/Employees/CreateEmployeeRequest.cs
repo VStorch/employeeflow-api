@@ -1,6 +1,6 @@
 namespace EmployeeFlow.DTOs
 {
-    public record CreateEmployeeDTO(
+    public record CreateEmployeeRequest(
         string Name,
         string Email,
         int CompanyId,

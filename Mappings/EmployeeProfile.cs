@@ -8,7 +8,8 @@ namespace EmployeeFlow.Mappings
     {
         public EmployeeProfile()
         {
-            CreateMap<DTOs.CreateEmployeeDTO, Employee>();
+            CreateMap<DTOs.CreateEmployeeRequest, Employee>();
+            CreateMap<UpdateEmployeeRequest, Employee>();
             
             CreateMap<Employee, EmployeeResponse>()
                 .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))

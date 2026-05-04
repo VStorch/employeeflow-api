@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using EmployeeFlow.Data;
 using EmployeeFlow.DTOs;
 using EmployeeFlow.DTOs.Employees;
@@ -18,45 +19,112 @@ namespace EmployeeFlow.Services
             _mapper = mapper;
         }
 
-        public async Task<EmployeeResponse> CreateAsync(CreateEmployeeDTO dto)
+        public async Task<EmployeeResponse> CreateAsync(CreateEmployeeRequest dto)
         {
-            await EnsureCompanyExistsAsync(dto.CompanyId);
-            await EnsureDepartmentBelongsToCompanyAsync(dto.DepartmentId, dto.CompanyId);
-            await EnsureRoleBelongsToCompanyAsync(dto.RoleId, dto.CompanyId);
+            await ValidateRelationsAsync(dto.CompanyId, dto.DepartmentId, dto.RoleId);
 
             var employee = _mapper.Map<Employee>(dto);
 
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 
-            var employeeWithRelations = await _context.Employees
+            return await _context.Employees
                 .AsNoTracking()
+                .Where(e => e.Id == employee.Id)
+                .ProjectTo<EmployeeResponse>(_mapper.ConfigurationProvider)
+                .SingleAsync();
+        }
+
+        public async Task<List<EmployeeResponse>> GetAllAsync(int companyId, int? departmentId = null, int? roleId = null)
+        {
+            await EnsureCompanyExistsAsync(companyId);
+
+            var query = _context.Employees
+                .AsNoTracking()
+                .Where(e => e.CompanyId == companyId);
+
+            if (departmentId.HasValue)
+                query = query.Where(e => e.DepartmentId == departmentId);
+
+            if (roleId.HasValue)
+                query = query.Where(e => e.RoleId == roleId);
+
+            return await query
+                .ProjectTo<EmployeeResponse>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+        }
+
+        public async Task<EmployeeResponse?> GetByIdAsync(int id, int companyId)
+        {
+            return await _context.Employees
+                .AsNoTracking()
+                .Where(e => e.Id == id && e.CompanyId == companyId)
+                .ProjectTo<EmployeeResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<EmployeeResponse> UpdateAsync(int id, int companyId, UpdateEmployeeRequest dto)
+        {
+            var employee = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Role)
-                .FirstOrDefaultAsync(e => e.Id == employee.Id);
+                .FirstOrDefaultAsync(e => e.Id == id && e.CompanyId == companyId);
 
-            if (employeeWithRelations is null)
-                throw new Exception("Employee not found after creation.");
+            if (employee is null)
+                throw new KeyNotFoundException("Employee not found.");
 
-            return _mapper.Map<EmployeeResponse>(employeeWithRelations);
+            await ValidateRelationsAsync(companyId, dto.DepartmentId, dto.RoleId);
+
+            _mapper.Map(dto, employee);
+
+            await _context.SaveChangesAsync();
+
+            return await _context.Employees
+                .AsNoTracking()
+                .Where(e => e.Id == id && e.CompanyId == companyId)
+                .ProjectTo<EmployeeResponse>(_mapper.ConfigurationProvider)
+                .SingleAsync();
+        }
+
+        public async Task DeleteAsync(int id, int companyId)
+        {
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == id && e.CompanyId == companyId);
+
+            if (employee is null)
+                throw new KeyNotFoundException("Employee not found.");
+
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
+        }
+
+
+        private async Task ValidateRelationsAsync(int companyId, int departmentId, int roleId)
+        {
+            var validation = await _context.Companies
+                .Where(c => c.Id == companyId)
+                .Select(c => new
+                {
+                    CompanyExists = true,
+                    DepartmentValid = c.Departments.Any(d => d.Id == departmentId),
+                    RoleValid = c.Roles.Any(r => r.Id == roleId)
+                })
+                .FirstOrDefaultAsync();
+
+            if (validation == null)
+                throw new KeyNotFoundException("Company not found.");
+
+            if (!validation.DepartmentValid)
+                throw new ArgumentException("Department not found or does not belong to this company.");
+
+            if (!validation.RoleValid)
+                throw new ArgumentException("Role not found or does not belong to this company.");
         }
 
         private async Task EnsureCompanyExistsAsync(int companyId)
         {
             if (!await _context.Companies.AnyAsync(c => c.Id == companyId))
-                throw new Exception("Company not found.");
-        }
-
-        private async Task EnsureDepartmentBelongsToCompanyAsync(int departmentId, int companyId)
-        {
-            if (!await _context.Departments.AnyAsync(d => d.Id == departmentId && d.CompanyId == companyId))
-                throw new Exception("Department not found or does not belong to this company.");
-        }
-
-        private async Task EnsureRoleBelongsToCompanyAsync(int roleId, int companyId)
-        {
-            if (!await _context.Roles.AnyAsync(r => r.Id == roleId && r.CompanyId == companyId))
-                throw new Exception("Role not found or does not belong to this company.");
+                throw new KeyNotFoundException("Company not found.");
         }
     }
 }

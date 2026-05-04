@@ -9,9 +9,14 @@ namespace EmployeeFlow.Mappings
         public EmployeeProfile()
         {
             CreateMap<DTOs.CreateEmployeeDTO, Employee>();
+            
             CreateMap<Employee, EmployeeResponse>()
-                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department.Name))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.Name));
+                .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+                .ForCtorParam("Name", opt => opt.MapFrom(src => src.Name))
+                .ForCtorParam("Email", opt => opt.MapFrom(src => src.Email))
+                .ForCtorParam("Department", opt => opt.MapFrom(src => src.Department.Name))
+                .ForCtorParam("Role", opt => opt.MapFrom(src => src.Role.Name))
+                .ForCtorParam("CompanyId", opt => opt.MapFrom(src => src.CompanyId));
         }
     }
 }

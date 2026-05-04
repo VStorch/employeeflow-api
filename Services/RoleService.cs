@@ -16,9 +16,9 @@ namespace EmployeeFlow.Services
 
         public async Task<RoleResponse> CreateAsync(CreateRoleRequest dto)
         {
-            await CompanyExists(dto.CompanyId);
+            await EnsureCompanyExistsAsync(dto.CompanyId);
 
-            await RoleExists(dto.Name, dto.CompanyId);
+            await EnsureRoleIsUniqueAsync(dto.Name, dto.CompanyId);
 
             var role = new Role
             {
@@ -34,7 +34,7 @@ namespace EmployeeFlow.Services
 
         public async Task<List<RoleResponse>> GetByCompanyAsync(int companyId)
         {
-            await CompanyExists(companyId);
+            await EnsureCompanyExistsAsync(companyId);
 
             return await _context.Roles
                 .Where(r => r.CompanyId == companyId)
@@ -42,7 +42,7 @@ namespace EmployeeFlow.Services
                 .ToListAsync();
         }
 
-        private async Task CompanyExists(int companyId)
+        private async Task EnsureCompanyExistsAsync(int companyId)
         {
             var companyExists = await _context.Companies
                 .AnyAsync(c => c.Id == companyId);
@@ -51,7 +51,7 @@ namespace EmployeeFlow.Services
                 throw new Exception("Company not found");
         }
 
-        private async Task RoleExists(string name, int companyId)
+        private async Task EnsureRoleIsUniqueAsync(string name, int companyId)
         {
             var alreadyExists = await _context.Roles
                 .AnyAsync(r => r.Name == name && r.CompanyId == companyId);

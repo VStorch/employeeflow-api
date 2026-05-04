@@ -36,11 +36,35 @@ namespace EmployeeFlow.Services
 
         public async Task<CompanyResponse?> GetByIdAsync(int id)
         {
+            return await _context.Companies
+                .Where(c => c.Id == id)
+                .Select(c => new CompanyResponse(c.Id, c.Name))
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<CompanyResponse?> UpdateAsync(int id, UpdateCompanyRequest dto)
+        {
             var company = await _context.Companies.FindAsync(id);
 
             if (company == null) return null;
 
+            company.Name = dto.Name;
+
+            await _context.SaveChangesAsync();
+
             return new CompanyResponse(company.Id, company.Name);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var company = await _context.Companies.FindAsync(id);
+
+            if (company == null) return false;
+
+            _context.Companies.Remove(company);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

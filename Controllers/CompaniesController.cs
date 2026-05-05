@@ -1,9 +1,12 @@
 using EmployeeFlow.DTOs.Company;
+using EmployeeFlow.Helpers;
 using EmployeeFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeFlow.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CompaniesController : ControllerBase
@@ -15,24 +18,20 @@ namespace EmployeeFlow.Controllers
             _service = service;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create(CreateCompanyRequest dto)
         {
             var result = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetMyCompany), null, result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyCompany()
         {
-            var result = await _service.GetAllAsync();
-            return Ok(result);
-        }
+            var companyId = User.GetCompanyId();
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await _service.GetByIdAsync(id);
+            var result = await _service.GetByIdAsync(companyId);
 
             if (result == null)
                 return NotFound();
@@ -40,10 +39,12 @@ namespace EmployeeFlow.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateCompanyRequest dto)
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateCompanyRequest dto)
         {
-            var result = await _service.UpdateAsync(id, dto);
+            var companyId = User.GetCompanyId();
+
+            var result = await _service.UpdateAsync(companyId, dto);
 
             if (result == null)
                 return NotFound();
@@ -51,10 +52,12 @@ namespace EmployeeFlow.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
         {
-            var success = await _service.DeleteAsync(id);
+            var companyId = User.GetCompanyId();
+
+            var success = await _service.DeleteAsync(companyId);
 
             if (!success)
                 return NotFound();

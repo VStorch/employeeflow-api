@@ -42,24 +42,18 @@ namespace EmployeeFlow.Services
             return new CompanyResponse(company.Id, company.Name);
         }
 
-        public async Task<List<CompanyResponse>> GetAllAsync()
+        public async Task<CompanyResponse?> GetByIdAsync(int companyId)
         {
             return await _context.Companies
-                .Select(c => new CompanyResponse(c.Id, c.Name))
-                .ToListAsync();
-        }
-
-        public async Task<CompanyResponse?> GetByIdAsync(int id)
-        {
-            return await _context.Companies
-                .Where(c => c.Id == id)
+                .Where(c => c.Id == companyId)
                 .Select(c => new CompanyResponse(c.Id, c.Name))
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<CompanyResponse?> UpdateAsync(int id, UpdateCompanyRequest dto)
+        public async Task<CompanyResponse?> UpdateAsync(int companyId, UpdateCompanyRequest dto)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _context.Companies
+                .FirstOrDefaultAsync(c => c.Id == companyId);
 
             if (company == null) return null;
 
@@ -70,9 +64,10 @@ namespace EmployeeFlow.Services
             return new CompanyResponse(company.Id, company.Name);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int companyId)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _context.Companies
+                .FirstOrDefaultAsync(c => c.Id == companyId);
 
             if (company == null) return false;
 

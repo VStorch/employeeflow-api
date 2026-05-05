@@ -11,7 +11,6 @@ namespace EmployeeFlow.Data
         public DbSet<Employee> Employees => Set<Employee>();
         public DbSet<Department> Departments => Set<Department>();
         public DbSet<Role> Roles => Set<Role>();
-        public DbSet<Request> Requests => Set<Request>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,11 +25,6 @@ namespace EmployeeFlow.Data
                 .HasOne(e => e.Role)
                 .WithMany(r => r.Employees)
                 .HasForeignKey(e => e.RoleId);
-
-            modelBuilder.Entity<Request>()
-                .HasOne(r => r.Employee)
-                .WithMany(e => e.Requests)
-                .HasForeignKey(r => r.EmployeeId);
 
                 modelBuilder.Entity<Employee>()
                     .HasOne(e => e.Company)

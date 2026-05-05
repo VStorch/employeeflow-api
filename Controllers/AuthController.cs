@@ -18,7 +18,7 @@ namespace EmployeeFlow.Controllers
 
         [HttpPost("login")]
         [EnableRateLimiting("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
             var result = await _authService.LoginAsync(request);
 

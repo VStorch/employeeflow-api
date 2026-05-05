@@ -19,7 +19,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRoleRequest dto)
+        public async Task<ActionResult<RoleResponse>> Create(CreateRoleRequest dto)
         {
             var companyId = User.GetCompanyId();
 
@@ -28,7 +28,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<RoleResponse>>> GetAll()
         {
             var companyId = User.GetCompanyId();
 
@@ -37,7 +37,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<RoleResponse>> GetById(int id)
         {
             var companyId = User.GetCompanyId();
 
@@ -50,7 +50,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateRoleRequest dto)
+        public async Task<ActionResult<RoleResponse>> Update(int id, UpdateRoleRequest dto)
         {
             var companyId = User.GetCompanyId();
 
@@ -59,7 +59,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var companyId = User.GetCompanyId();
 

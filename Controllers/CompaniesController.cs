@@ -20,14 +20,14 @@ namespace EmployeeFlow.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCompanyRequest dto)
+        public async Task<ActionResult<CompanyResponse>> Create(CreateCompanyRequest dto)
         {
             var result = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetMyCompany), null, result);
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyCompany()
+        public async Task<ActionResult<CompanyResponse>> GetMyCompany()
         {
             var companyId = User.GetCompanyId();
 
@@ -40,7 +40,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(UpdateCompanyRequest dto)
+        public async Task<ActionResult<CompanyResponse>> Update(UpdateCompanyRequest dto)
         {
             var companyId = User.GetCompanyId();
 
@@ -53,7 +53,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete()
+        public async Task<ActionResult> Delete()
         {
             var companyId = User.GetCompanyId();
 

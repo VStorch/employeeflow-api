@@ -63,7 +63,7 @@ if (app.Environment.IsDevelopment())
 
     app.MapScalarApiReference(options =>{
         options.WithTitle("EmployeeFlow API")
-            .WithTheme(ScalarTheme.Moon)
+            .WithTheme(ScalarTheme.DeepSpace)
             .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }

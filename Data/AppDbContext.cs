@@ -21,7 +21,7 @@ namespace EmployeeFlow.Data
                 .HasOne(u => u.Company)
                 .WithMany(c => c.Users)
                 .HasForeignKey(u => u.CompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
             
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
@@ -30,18 +30,20 @@ namespace EmployeeFlow.Data
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Department)
                 .WithMany(d => d.Employees)
-                .HasForeignKey(e => e.DepartmentId);
+                .HasForeignKey(e => e.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Role)
                 .WithMany(r => r.Employees)
-                .HasForeignKey(e => e.RoleId);
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Company)
                 .WithMany(c => c.Employees)
                 .HasForeignKey(e => e.CompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Employee>()
                 .HasIndex(e => new { e.Email, e.CompanyId })
@@ -51,13 +53,13 @@ namespace EmployeeFlow.Data
                 .HasOne(d => d.Company)
                 .WithMany(c => c.Departments)
                 .HasForeignKey(d => d.CompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Role>()
                 .HasOne(r => r.Company)
                 .WithMany(c => c.Roles)
                 .HasForeignKey(r => r.CompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

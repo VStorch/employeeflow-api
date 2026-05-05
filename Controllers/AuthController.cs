@@ -1,6 +1,7 @@
 using EmployeeFlow.DTOs.Auth;
 using EmployeeFlow.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace EmployeeFlow.Controllers
 {
@@ -16,6 +17,7 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var result = await _authService.LoginAsync(request);

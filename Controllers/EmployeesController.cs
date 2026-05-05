@@ -1,4 +1,4 @@
-using EmployeeFlow.DTOs;
+using EmployeeFlow.DTOs.Employees;
 using EmployeeFlow.Helpers;
 using EmployeeFlow.Services;
 using Microsoft.AspNetCore.Authorization;

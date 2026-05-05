@@ -8,7 +8,7 @@ namespace EmployeeFlow.Mappings
     {
         public EmployeeProfile()
         {
-            CreateMap<DTOs.CreateEmployeeRequest, Employee>();
+            CreateMap<CreateEmployeeRequest, Employee>();
             CreateMap<UpdateEmployeeRequest, Employee>();
             
             CreateMap<Employee, EmployeeResponse>()

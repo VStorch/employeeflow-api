@@ -2,6 +2,8 @@ namespace EmployeeFlow.DTOs.Company
 {
     public record CreateCompanyRequest
     (
-        string Name
+        string Name,
+        string Email,
+        string Password
     );
 }

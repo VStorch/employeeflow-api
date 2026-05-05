@@ -1,7 +1,6 @@
 namespace EmployeeFlow.DTOs.Department
 {
     public record CreateDepartmentRequest(
-        string Name,
-        int CompanyId
+        string Name
     );
 }

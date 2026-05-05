@@ -19,26 +19,26 @@ namespace EmployeeFlow.Services
             _mapper = mapper;
         }
 
-        public async Task<EmployeeResponse> CreateAsync(CreateEmployeeRequest dto)
+        public async Task<EmployeeResponse> CreateAsync(int companyId, CreateEmployeeRequest dto)
         {
-            await ValidateRelationsAsync(dto.CompanyId, dto.DepartmentId, dto.RoleId);
+            await ValidateRelationsAsync(companyId, dto.DepartmentId, dto.RoleId);
 
             var employee = _mapper.Map<Employee>(dto);
+
+            employee.CompanyId = companyId;
 
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 
             return await _context.Employees
                 .AsNoTracking()
-                .Where(e => e.Id == employee.Id)
+                .Where(e => e.Id == employee.Id && e.CompanyId == companyId)
                 .ProjectTo<EmployeeResponse>(_mapper.ConfigurationProvider)
                 .SingleAsync();
         }
 
         public async Task<List<EmployeeResponse>> GetAllAsync(int companyId, int? departmentId = null, int? roleId = null)
         {
-            await EnsureCompanyExistsAsync(companyId);
-
             var query = _context.Employees
                 .AsNoTracking()
                 .Where(e => e.CompanyId == companyId);
@@ -74,6 +74,8 @@ namespace EmployeeFlow.Services
             await ValidateRelationsAsync(companyId, dto.DepartmentId, dto.RoleId);
 
             _mapper.Map(dto, employee);
+
+            employee.CompanyId = companyId;
 
             await _context.SaveChangesAsync();
 
@@ -117,12 +119,6 @@ namespace EmployeeFlow.Services
 
             if (!validation.RoleValid)
                 throw new ArgumentException("Role not found or does not belong to this company.");
-        }
-
-        private async Task EnsureCompanyExistsAsync(int companyId)
-        {
-            if (!await _context.Companies.AnyAsync(c => c.Id == companyId))
-                throw new KeyNotFoundException("Company not found.");
         }
     }
 }

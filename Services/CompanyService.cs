@@ -24,6 +24,16 @@ namespace EmployeeFlow.Services
             _context.Companies.Add(company);
             await _context.SaveChangesAsync();
 
+            var user = new User
+            {
+                Email = dto.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                CompanyId = company.Id
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
             return new CompanyResponse(company.Id, company.Name);
         }
 

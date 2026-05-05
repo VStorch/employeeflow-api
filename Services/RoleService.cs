@@ -18,27 +18,26 @@ namespace EmployeeFlow.Services
             _mapper = mapper;
         }
 
-        public async Task<RoleResponse> CreateAsync(CreateRoleRequest dto)
+        public async Task<RoleResponse> CreateAsync(int companyId, CreateRoleRequest dto)
         {
-            await EnsureCompanyExistsAsync(dto.CompanyId);
-            await EnsureRoleIsUniqueAsync(dto.Name, dto.CompanyId);
+            await EnsureRoleIsUniqueAsync(dto.Name, companyId);
 
             var role = _mapper.Map<Role>(dto);
+
+            role.CompanyId = companyId;
 
             _context.Roles.Add(role);
             await _context.SaveChangesAsync();
 
             return await _context.Roles
                 .AsNoTracking()
-                .Where(r => r.Id == role.Id)
+                .Where(r => r.Id == role.Id && r.CompanyId == companyId)
                 .ProjectTo<RoleResponse>(_mapper.ConfigurationProvider)
                 .SingleAsync();
         }
 
         public async Task<List<RoleResponse>> GetByCompanyAsync(int companyId)
         {
-            await EnsureCompanyExistsAsync(companyId);
-
             return await _context.Roles
                 .AsNoTracking()
                 .Where(r => r.CompanyId == companyId)
@@ -67,11 +66,13 @@ namespace EmployeeFlow.Services
 
             _mapper.Map(dto, role);
 
+            role.CompanyId = companyId;
+
             await _context.SaveChangesAsync();
 
             return await _context.Roles
                 .AsNoTracking()
-                .Where(r => r.Id == id)
+                .Where(r => r.Id == id && r.CompanyId == companyId)
                 .ProjectTo<RoleResponse>(_mapper.ConfigurationProvider)
                 .SingleAsync();
         }
@@ -86,12 +87,6 @@ namespace EmployeeFlow.Services
 
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
-        }
-
-        private async Task EnsureCompanyExistsAsync(int companyId)
-        {
-            if (!await _context.Companies.AnyAsync(c => c.Id == companyId))
-                throw new KeyNotFoundException("Company not found.");
         }
 
         private async Task EnsureRoleIsUniqueAsync(string name, int companyId, int? ignoreId = null)

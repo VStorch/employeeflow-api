@@ -33,6 +33,11 @@ namespace EmployeeFlow.Middleware
         {
             var problem = exception switch
             {
+                UnauthorizedAccessException => CreateProblem(
+                    status: HttpStatusCode.Unauthorized,
+                    title: "Unauthorized",
+                    detail: exception.Message),
+                    
                 KeyNotFoundException => CreateProblem(
                     status: HttpStatusCode.NotFound,
                     title: "Resource not found",

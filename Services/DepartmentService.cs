@@ -18,27 +18,26 @@ namespace EmployeeFlow.Services
             _mapper = mapper;
         }
 
-        public async Task<DepartmentResponse> CreateAsync(CreateDepartmentRequest dto)
+        public async Task<DepartmentResponse> CreateAsync(int companyId, CreateDepartmentRequest dto)
         {
-            await EnsureCompanyExistsAsync(dto.CompanyId);
-            await EnsureDepartmentIsUniqueAsync(dto.Name, dto.CompanyId);
+            await EnsureDepartmentIsUniqueAsync(dto.Name, companyId);
 
             var department = _mapper.Map<Department>(dto);
+
+            department.CompanyId = companyId;
 
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 
             return await _context.Departments
                 .AsNoTracking()
-                .Where(d => d.Id == department.Id)
+                .Where(d => d.Id == department.Id && d.CompanyId == companyId)
                 .ProjectTo<DepartmentResponse>(_mapper.ConfigurationProvider)
                 .SingleAsync();
         }
 
         public async Task<List<DepartmentResponse>> GetByCompanyAsync(int companyId)
         {
-            await EnsureCompanyExistsAsync(companyId);
-
             return await _context.Departments
                 .AsNoTracking()
                 .Where(d => d.CompanyId == companyId)
@@ -67,11 +66,13 @@ namespace EmployeeFlow.Services
 
             _mapper.Map(dto, department);
 
+            department.CompanyId = companyId;
+
             await _context.SaveChangesAsync();
 
             return await _context.Departments
                 .AsNoTracking()
-                .Where(d => d.Id == id)
+                .Where(d => d.Id == id && d.CompanyId == companyId)
                 .ProjectTo<DepartmentResponse>(_mapper.ConfigurationProvider)
                 .SingleAsync();
         }
@@ -86,12 +87,6 @@ namespace EmployeeFlow.Services
 
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
-        }
-
-        private async Task EnsureCompanyExistsAsync(int companyId)
-        {
-            if (!await _context.Companies.AnyAsync(c => c.Id == companyId))
-                throw new KeyNotFoundException("Company not found.");
         }
 
         private async Task EnsureDepartmentIsUniqueAsync(string name, int companyId, int? ignoreId = null)

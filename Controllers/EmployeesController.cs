@@ -1,9 +1,12 @@
 using EmployeeFlow.DTOs;
+using EmployeeFlow.Helpers;
 using EmployeeFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeFlow.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EmployeesController : ControllerBase
@@ -18,23 +21,28 @@ namespace EmployeeFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateEmployeeRequest dto)
         {
-            var employee = await _service.CreateAsync(dto);
+            var companyId = User.GetCompanyId();
+
+            var employee = await _service.CreateAsync(companyId, dto);
             return Ok(employee);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll(
-            [FromQuery] int companyId,
             [FromQuery] int? departmentId,
             [FromQuery] int? roleId)
         {
+            var companyId = User.GetCompanyId();
+
             var employees = await _service.GetAllAsync(companyId, departmentId, roleId);
             return Ok(employees);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id, [FromQuery] int companyId)
+        public async Task<IActionResult> GetById(int id)
         {
+            var companyId = User.GetCompanyId();
+
             var employee = await _service.GetByIdAsync(id, companyId);
             if (employee is null)
                 return NotFound();
@@ -43,15 +51,19 @@ namespace EmployeeFlow.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromQuery] int companyId, UpdateEmployeeRequest dto)
+        public async Task<IActionResult> Update(int id, UpdateEmployeeRequest dto)
         {
+            var companyId = User.GetCompanyId();
+
             var updatedEmployee = await _service.UpdateAsync(id, companyId, dto);
             return Ok(updatedEmployee);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id, [FromQuery] int companyId)
+        public async Task<IActionResult> Delete(int id)
         {
+            var companyId = User.GetCompanyId();
+
             await _service.DeleteAsync(id, companyId);
             return NoContent();
         }

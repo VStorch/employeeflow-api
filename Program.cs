@@ -1,7 +1,10 @@
+using System.Text;
 using EmployeeFlow.Data;
 using EmployeeFlow.Middleware;
 using EmployeeFlow.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +14,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+    };
+});
+
 builder.Services.AddAutoMapper(typeof(Program));
 
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<RoleService>();
@@ -25,6 +47,10 @@ var app = builder.Build();
 app.UseGlobalExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

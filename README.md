@@ -197,4 +197,5 @@ Migrations/
 ## 👨‍💻 Autor
 
 Vinícius Storch.
+
 Projeto desenvolvido para fins de estudo e portfólio backend.

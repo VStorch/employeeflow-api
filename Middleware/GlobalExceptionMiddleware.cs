@@ -33,6 +33,11 @@ namespace EmployeeFlow.Middleware
         {
             var problem = exception switch
             {
+                ConflictException => CreateProblem(
+                    status: HttpStatusCode.Conflict,
+                    title: "Conflict",
+                    detail: exception.Message),
+
                 UnauthorizedAccessException => CreateProblem(
                     status: HttpStatusCode.Unauthorized,
                     title: "Unauthorized",

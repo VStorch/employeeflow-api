@@ -21,18 +21,23 @@ namespace EmployeeFlow.Services
                 Name = dto.Name
             };
 
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
-
             var user = new User
             {
                 Email = dto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                CompanyId = company.Id
+                Company = company
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new ConflictException("This email is already registered.");
+            }
 
             return new CompanyResponse(company.Id, company.Name);
         }

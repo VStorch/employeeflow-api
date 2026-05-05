@@ -24,11 +24,20 @@ namespace EmployeeFlow.Services
             await ValidateRelationsAsync(companyId, dto.DepartmentId, dto.RoleId);
 
             var employee = _mapper.Map<Employee>(dto);
-
             employee.CompanyId = companyId;
 
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Employees.Add(employee);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (IsUniqueConstraintViolation(ex, "IX_Employees_Email_CompanyId"))
+                    throw new ConflictException("An employee with this email already exists in this company.");
+
+                throw;
+            }
 
             return await _context.Employees
                 .AsNoTracking()
@@ -74,10 +83,19 @@ namespace EmployeeFlow.Services
             await ValidateRelationsAsync(companyId, dto.DepartmentId, dto.RoleId);
 
             _mapper.Map(dto, employee);
-
             employee.CompanyId = companyId;
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                if (IsUniqueConstraintViolation(ex, "IX_Employees_Email_CompanyId"))
+                    throw new ConflictException("An employee with this email already exists in this company.");
+
+                throw;
+            }
 
             return await _context.Employees
                 .AsNoTracking()
@@ -97,7 +115,6 @@ namespace EmployeeFlow.Services
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
         }
-
 
         private async Task ValidateRelationsAsync(int companyId, int departmentId, int roleId)
         {
@@ -119,6 +136,11 @@ namespace EmployeeFlow.Services
 
             if (!validation.RoleValid)
                 throw new ArgumentException("Role not found or does not belong to this company.");
+        }
+
+        private static bool IsUniqueConstraintViolation(DbUpdateException ex, string indexName)
+        {
+            return ex.InnerException?.Message.Contains(indexName) == true;
         }
     }
 }

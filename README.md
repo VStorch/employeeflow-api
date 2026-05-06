@@ -88,16 +88,28 @@ Fluxo:
 
 ## 🐳 Docker
 
-O projeto possui suporte a Docker Compose.
+O projeto é totalmente containerizado utilizando Docker Compose.
 
-- SQL Server
-- network interna
-- variáveis via .env
+A stack inclui:
 
-Para subir a aplicação:
+- API ASP.NET Core
+- SQL Server 2022
+- Rede interna entre containers
+- Variáveis de ambiente via .env
+
+### Subir a aplicação
 
 ```bash
 docker-compose up --build
+```
+
+### Variáveis de ambiente
+
+Crie um arquivo `.env`:
+
+```bash
+DB_PASSWORD=SuaSenhaDoBanco
+JWT_SECRET=SuaChaveJWT
 ```
 
 ---
@@ -107,6 +119,7 @@ docker-compose up --build
 - Global Exception Handling via Middleware
 - Rate Limiting no endpoint de login contra brute force
 - JWT Authentication com validação de lifetime e claims
+- Containerização completa com Docker Compose
 - Constraints de banco (Unique Email)
 - Delete behaviors controlados (Cascade / Restrict)
 - Uso de DTOs para isolamento da camada de domínio
@@ -157,10 +170,9 @@ dotnet run
 
 ## 📄 Documentação da API
 
-A documentação da API está disponível via **Scalar** (OpenAPI UI para documentação interativa da API):
-
+A API possui documentação interativa via **Scalar**:
 ```bash
-/scalar
+/scalar/v1
 ```
 
 <img src="assets/scalar-ui.png" width="100%">

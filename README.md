@@ -17,6 +17,9 @@ EmployeeFlow é uma API backend desenvolvida em **ASP.NET Core (.NET 9)** para g
 - Scalar (documentação de API)
 - BCrypt (hash de senhas)
 - Middleware global de exceções
+- xUnit (testes unitários)
+- FluentAssertions
+- SQLite (in-memory para testes)
 
 ---
 
@@ -56,20 +59,6 @@ O projeto segue uma arquitetura em camadas:
 
 ### Roles
 - Gerenciamento de permissões/cargos
-
----
-
-## 🗄️ Banco de Dados
-
-O projeto utiliza **Entity Framework Core com SQL Server**.
-
-Migrações já incluídas no projeto:
-
-- InitialCreate
-- AddCompany
-- JWTAuthentication
-- AddUniqueEmailToUser
-- UpdateDeleteBehaviorsToCascadeAndRestrict
 
 ---
 
@@ -114,6 +103,33 @@ JWT_SECRET=SuaChaveJWT
 
 ---
 
+
+## 🧪 Testes
+
+O projeto possui testes unitários para validação das regras de negócio.
+
+### Abordagem
+
+- Uso de **xUnit** como framework de testes
+- **FluentAssertions** para escrita expressiva dos testes
+- **SQLite em memória** para simular o banco de dados
+- Testes focados na camada de **Services**
+
+### Cobertura atual
+
+- Criação de funcionário (caso válido)
+- Validação de relações (empresa, departamento, cargo)
+- Tratamento de erros de domínio
+- Violação de constraints (email duplicado)
+
+### Executar testes
+
+```bash
+dotnet test
+```
+
+---
+
 ## ⚙️ Destaques técnicos
 
 - Global Exception Handling via Middleware
@@ -124,6 +140,8 @@ JWT_SECRET=SuaChaveJWT
 - Delete behaviors controlados (Cascade / Restrict)
 - Uso de DTOs para isolamento da camada de domínio
 - AutoMapper para mapeamento entre camadas
+- Testes unitários com banco relacional em memória (SQLite)
+- Isolamento de regras de negócio via camada de Services
 
 ---
 
@@ -187,7 +205,7 @@ A API possui documentação interativa via **Scalar**:
 - Autenticação segura com JWT
 - Senhas armazenadas com hash (BCrypt)
 - Uso de migrations para versionamento do banco
-- Versionamento de mensagens seguindo a especificação de Conventional Commits
+- Versionamento de commits seguindo Conventional Commits
 
 ---
 

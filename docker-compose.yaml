@@ -5,12 +5,25 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver-dev
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
       - sql_data:/var/opt/mssql
+
+  api:
+    build: .
+    container_name: employee-flow
+    depends_on:
+      - sqlserver
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=EmployeeFlowDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
+      JwtSettings__Secret: ${JWT_SECRET}
+      ASPNETCORE_URLS: "http://0.0.0.0:8080"
+      ENABLE_DOCS: "true"
 
 volumes:
   sql_data:

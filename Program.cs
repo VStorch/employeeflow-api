@@ -57,11 +57,14 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+var enableDocs = builder.Configuration.GetValue<bool>("ENABLE_DOCS");
+
+if (enableDocs)
 {
     app.MapOpenApi();
 
-    app.MapScalarApiReference(options =>{
+    app.MapScalarApiReference(options =>
+    {
         options.WithTitle("EmployeeFlow API")
             .WithTheme(ScalarTheme.DeepSpace)
             .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
@@ -69,7 +72,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseGlobalExceptionHandler();
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

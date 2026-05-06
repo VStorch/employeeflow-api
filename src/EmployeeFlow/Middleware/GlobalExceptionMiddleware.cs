@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using EmployeeFlow.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeFlow.Middleware

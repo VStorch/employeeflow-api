@@ -1,9 +1,9 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using EmployeeFlow.Data;
-using EmployeeFlow.DTOs;
 using EmployeeFlow.DTOs.Employees;
 using EmployeeFlow.Entities;
+using EmployeeFlow.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeFlow.Services

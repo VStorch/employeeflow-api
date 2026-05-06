@@ -1,9 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
+COPY src/EmployeeFlow/EmployeeFlow.csproj src/EmployeeFlow/
+RUN dotnet restore src/EmployeeFlow/EmployeeFlow.csproj
+
 COPY . .
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/publish
+
+RUN dotnet publish src/EmployeeFlow/EmployeeFlow.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app

@@ -1,6 +1,7 @@
 using EmployeeFlow.Data;
 using EmployeeFlow.DTOs.Company;
 using EmployeeFlow.Entities;
+using EmployeeFlow.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeFlow.Services

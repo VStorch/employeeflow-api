@@ -1,6 +1,8 @@
+using EmployeeFlow.DTOs.Employees;
 using EmployeeFlow.Services;
 using EmployeeFlow.Tests.Common;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeFlow.Tests.Services
 {
@@ -36,6 +38,67 @@ namespace EmployeeFlow.Tests.Services
 
             result.Should().NotBeNull();
             result.Email.Should().Be(dto.Email);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ShouldThrow_WhenDepartmentInvalid()
+        {
+            var dto = new CreateEmployeeRequest(
+                Name: "Test User",
+                Email: "test@test.com",
+                DepartmentId: 999,
+                RoleId: 1
+            );
+
+            Func<Task> act = async () => await _service.CreateAsync(1, dto);
+
+            await act.Should()
+                .ThrowAsync<ArgumentException>()
+                .WithMessage("Department not found or does not belong to this company.");
+        }
+
+        [Fact]
+        public async Task CreateAsync_ShouldThrow_WhenRoleInvalid()
+        {
+            var dto = new CreateEmployeeRequest(
+                Name: "Test User",
+                Email: "test@test.com",
+                DepartmentId: 1,
+                RoleId: 999
+            );
+
+            Func<Task> act = async () => await _service.CreateAsync(1, dto);
+
+            await act.Should()
+                .ThrowAsync<ArgumentException>()
+                .WithMessage("Role not found or does not belong to this company.");
+        }
+
+        [Fact]
+        public async Task CreateAsync_ShouldThrow_WhenCompanyInvalid()
+        {
+            var dto = TestDataFactory.CreateEmployeeRequest();
+
+            Func<Task> act = async () => await _service.CreateAsync(999, dto);
+
+            await act.Should()
+                .ThrowAsync<KeyNotFoundException>()
+                .WithMessage("Company not found.");
+        }
+
+        [Fact]
+        public async Task CreateAsync_ShouldThrow_WhenEmailAlreadyExists()
+        {
+            var dto = TestDataFactory.CreateEmployeeRequest();
+
+            await _service.CreateAsync(1, dto);
+
+            Func<Task> act = async () => await _service.CreateAsync(1, dto);
+
+            var exception = await act.Should().ThrowAsync<DbUpdateException>();
+
+            exception.Which.InnerException!.Message
+                .Should().Contain("UNIQUE");
         }
     }
 }

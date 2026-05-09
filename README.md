@@ -103,7 +103,6 @@ JWT_SECRET=SuaChaveJWT
 
 ---
 
-
 ## 🧪 Testes
 
 O projeto possui testes unitários para validação das regras de negócio.

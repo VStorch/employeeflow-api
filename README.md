@@ -42,22 +42,27 @@ O projeto segue uma arquitetura em camadas:
 ## 📦 Funcionalidades
 
 ### Autenticação
+
 - Login com JWT
 - Validação de token
 - Proteção de rotas
 
 ### Empresas
+
 - Criar, editar, listar e remover empresas
 
 ### Departamentos
+
 - CRUD completo
 - Associação com empresas
 
 ### Funcionários
+
 - CRUD completo
 - Associação com departamentos e cargos
 
 ### Roles
+
 - Gerenciamento de permissões/cargos
 
 ---
@@ -67,6 +72,7 @@ O projeto segue uma arquitetura em camadas:
 A API utiliza autenticação baseada em JWT.
 
 Fluxo:
+
 1. Usuário realiza login (`/api/auth/login`)
 2. API retorna token JWT
 3. Token deve ser enviado no header:
@@ -149,7 +155,7 @@ dotnet test
 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/VStorch/employee-flow.git
+git clone https://github.com/VStorch/employeeflow-api.git
 ```
 
 2. Configurar variáveis de ambiente
@@ -183,11 +189,13 @@ dotnet ef database update
 ```bash
 dotnet run
 ````
+
 ---
 
 ## 📄 Documentação da API
 
 A API possui documentação interativa via **Scalar**:
+
 ```bash
 /scalar/v1
 ```

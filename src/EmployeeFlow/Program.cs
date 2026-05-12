@@ -85,11 +85,6 @@ if (enableDocs)
 
 app.UseGlobalExceptionHandler();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
 app.UseCors("ReactPolicy");
 
 app.UseRateLimiter();

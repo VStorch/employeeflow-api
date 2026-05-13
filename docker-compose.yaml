@@ -46,7 +46,7 @@ services:
 
       JwtSettings__Secret: ${JWT_SECRET}
 
-      ENABLE_DOCS: "false"
+      ENABLE_DOCS: "true"
 
 volumes:
   postgres_data:

@@ -1,8 +1,17 @@
-# EmployeeFlow
+# EmployeeFlow API
 
-EmployeeFlow é uma API backend desenvolvida em **ASP.NET Core (.NET 9)** para gestão multi-empresa com autenticação JWT, controle de permissões e arquitetura escalável em camadas, simulando um sistema real corporativo de RH.
+API REST corporativa para gestão multi-empresa de funcionários, departamentos e cargos, desenvolvida com ASP.NET Core (.NET 9), SQL Server/PostgreSQL e autenticação JWT.
 
-![.NET 9](https://img.shields.io/badge/.NET-9.0-purple)
+## 🔗 Links
+
+- Documentação Scalar: https://employeeflow-api.duckdns.org/scalar/v1
+- Frontend: https://employeeflow-web.vercel.app
+
+![.NET 9](https://img.shields.io/badge/.NET%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 
 ---
 
@@ -11,6 +20,7 @@ EmployeeFlow é uma API backend desenvolvida em **ASP.NET Core (.NET 9)** para g
 - ASP.NET Core 9
 - Entity Framework Core
 - SQL Server
+- PostgreSQL (Npgsql)
 - JWT Authentication
 - AutoMapper
 - Docker / Docker Compose
@@ -23,47 +33,119 @@ EmployeeFlow é uma API backend desenvolvida em **ASP.NET Core (.NET 9)** para g
 
 ---
 
-## 🧱 Arquitetura
+## 🗄️ Banco de dados
 
-O projeto segue uma arquitetura em camadas:
+O projeto foi desenhado para ser agnóstico ao banco de dados, utilizando as abstrações do Entity Framework Core. Isso permite alternar entre diferentes provedores com alterações mínimas na camada de infraestrutura.
 
-- **Controllers** → Camada de entrada (HTTP)
-- **Services** → Regras de negócio
-- **Data** → DbContext e acesso ao banco
-- **DTOs** → Contratos de entrada e saída
-- **Entities** → Modelos de domínio
-- **Mappings** → Perfis do AutoMapper
-- **Middleware** → Tratamento global de erros
-- **Exceptions** → Exceções customizadas
-- **Helpers** → Extensões auxiliares (claims, etc.)
+| Branch              | Provider            | Motivação                                |
+| ------------------- | ------------------- | ---------------------------------------- |
+| `main`              | PostgreSQL (Npgsql) | Otimização de recursos na OCI            |
+| `sqlserver-version` | SQL Server 2022     | Compatibilidade com padrões corporativos |
+
+### Diagrama de Entidades e Relacionamentos (ER)
+
+```mermaid
+erDiagram
+    COMPANY ||--o{ USER : "possui (auth)"
+    COMPANY ||--o{ DEPARTMENT : "gerencia"
+    COMPANY ||--o{ ROLE : "define"
+    COMPANY ||--o{ EMPLOYEE : "contrata"
+
+    DEPARTMENT ||--o{ EMPLOYEE : "aloca"
+    ROLE ||--o{ EMPLOYEE : "atribui"
+
+    USER {
+        int Id
+        string Email
+        string PasswordHash
+        int CompanyId
+    }
+
+    COMPANY {
+        int Id
+        string Name
+    }
+
+    DEPARTMENT {
+        int Id
+        string Name
+        int CompanyId
+    }
+
+    ROLE {
+        int Id
+        string Name
+        int CompanyId
+    }
+
+    EMPLOYEE {
+        int Id
+        string Name
+        string Email
+        int CompanyId
+        int DepartmentId
+        int RoleId
+    }
+```
+
+**Relacionamento Company vs User (1:N):** Embora o fluxo atual contemple um usuário principal por empresa, optei pela relação 1:N para permitir escalabilidade futura. Isso possibilita que uma única organização possua múltiplos operadores com credenciais distintas no futuro.
 
 ---
 
-## 📦 Funcionalidades
+## 🧱 Arquitetura
 
-### Autenticação
+A aplicação foi estruturada seguindo uma arquitetura em camadas, promovendo separação de responsabilidades, desacoplamento e maior testabilidade.
 
-- Login com JWT
-- Validação de token
-- Proteção de rotas
+Principais camadas:
 
-### Empresas
+- Controllers → exposição dos endpoints HTTP
+- Services → regras de negócio e orquestração
+- Data → persistência e Entity Framework Core
+- DTOs → contratos de entrada e saída
+- Entities → modelos de domínio
+- Middleware → tratamento global de exceções
 
-- Criar, editar, listar e remover empresas
+### Diagrama de Fluxo
 
-### Departamentos
+```mermaid
+graph TD
+    subgraph Client
+        React[React Frontend]
+    end
 
-- CRUD completo
-- Associação com empresas
+    subgraph API [EmployeeFlow API]
+        M1[Global Exception Middleware]
+        M2[Rate Limiter & Auth]
+        Controller[Controllers]
+        Service[Services - Business Logic]
+        Data[Data Layer - EF Core]
+    end
 
-### Funcionários
+    subgraph Database
+        SQL[SQL Server / PostgreSQL]
+    end
 
-- CRUD completo
-- Associação com departamentos e cargos
+    React --> M1
+    M1 --> M2
+    M2 --> Controller
+    Controller --> Service
+    Service --> Data
+    Data --> SQL
+```
 
-### Roles
+---
 
-- Gerenciamento de permissões/cargos
+## ✨ Features
+
+- Autenticação JWT com controle de acesso
+- Gestão multi-empresa
+- CRUD completo de funcionários, departamentos e cargos
+- Validações de domínio
+- Middleware global de exceções
+- Rate limiting no login
+- Testes unitários da camada de services
+- Containerização completa com Docker Compose
+- Deploy em produção com OCI
 
 ---
 
@@ -175,16 +257,10 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,
 
 dotnet user-secrets set "JwtSettings:Secret" "SuaChaveJWT"
 
-dotnet user-secrets list // Para ver os segredos criados
+dotnet user-secrets list
 ```
 
-3. Executar migrations
-
-```bash
-dotnet ef database update
-```
-
-4. Rodar a aplicação
+3. Rodar a aplicação
 
 ```bash
 dotnet run
@@ -204,14 +280,13 @@ A API possui documentação interativa via **Scalar**:
 
 ---
 
-## 📌 Boas práticas aplicadas
+## 🏗️ Decisões Técnicas
 
-- Arquitetura em camadas com separação de responsabilidades
-- Middleware global para exceções
-- DTOs para isolamento da camada de domínio
-- Autenticação segura com JWT
-- Senhas armazenadas com hash (BCrypt)
-- Uso de migrations para versionamento do banco
+- Uso de DTOs para evitar exposição direta das entidades
+- SQLite em memória nos testes para comportamento relacional real
+- Middleware global para padronização de respostas de erro
+- BCrypt para hash seguro de senhas
+- Docker Compose para isolamento completo do ambiente
 - Versionamento de commits seguindo Conventional Commits
 
 ---

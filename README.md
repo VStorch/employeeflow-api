@@ -6,6 +6,7 @@ API REST corporativa para gestão multi-empresa de funcionários, departamentos 
 
 - Documentação Scalar: https://employeeflow-api.duckdns.org/scalar/v1
 - Frontend: https://employeeflow-web.vercel.app
+- Repositório Frontend: https://github.com/VStorch/employeeflow-web.git
 
 ![.NET 9](https://img.shields.io/badge/.NET%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
@@ -257,7 +258,7 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Po
 
 dotnet user-secrets set "JwtSettings:Secret" "SuaChaveJWT"
 
-dotnet user-secrets list // Para ver os segredos criados
+dotnet user-secrets list
 ```
 
 3. Rodar a aplicação

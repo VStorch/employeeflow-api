@@ -86,6 +86,12 @@ if (enableDocs)
     });
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 app.UseGlobalExceptionHandler();
 
 app.UseCors("ReactPolicy");

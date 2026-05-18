@@ -2,6 +2,8 @@
 
 API REST corporativa para gestão multi-empresa de funcionários, departamentos e cargos, desenvolvida com ASP.NET Core (.NET 9), SQL Server/PostgreSQL e autenticação JWT.
 
+[![EmployeeFlow Deploy](https://github.com/VStorch/employeeflow-api/actions/workflows/deploy.yml/badge.svg)](https://github.com/VStorch/employeeflow-api/actions/workflows/deploy.yml)
+
 ## 🔗 Links
 
 - Documentação Scalar: https://employeeflow-api.duckdns.org/scalar/v1

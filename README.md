@@ -6,6 +6,7 @@ API REST corporativa para gestão multi-empresa de funcionários, departamentos 
 
 - Documentação Scalar: https://employeeflow-api.duckdns.org/scalar/v1
 - Frontend: https://employeeflow-web.vercel.app
+- Repositório Frontend: https://github.com/VStorch/employeeflow-web.git
 
 ![.NET 9](https://img.shields.io/badge/.NET%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
@@ -96,14 +97,18 @@ erDiagram
 
 A aplicação foi estruturada seguindo uma arquitetura em camadas, promovendo separação de responsabilidades, desacoplamento e maior testabilidade.
 
-Principais camadas:
+Estrutura principal:
 
-- Controllers → exposição dos endpoints HTTP
-- Services → regras de negócio e orquestração
-- Data → persistência e Entity Framework Core
-- DTOs → contratos de entrada e saída
-- Entities → modelos de domínio
-- Middleware → tratamento global de exceções
+```bash
+Controllers/
+Services/
+DTOs/
+Entities/
+Data/
+Middleware/
+Mappings/
+Migrations/
+```
 
 ### Diagrama de Fluxo
 
@@ -135,17 +140,31 @@ graph TD
 
 ---
 
-## ✨ Features
+## ⚙️ Destaques Técnicos
 
-- Autenticação JWT com controle de acesso
-- Gestão multi-empresa
-- CRUD completo de funcionários, departamentos e cargos
-- Validações de domínio
-- Middleware global de exceções
-- Rate limiting no login
-- Testes unitários da camada de services
+- Global Exception Handling via Middleware
+- Rate Limiting no endpoint de login contra brute force
+- JWT Authentication com validação de lifetime e claims
+- BCrypt para hash seguro de senhas
+- Constraints de banco (Unique Email)
+- Delete behaviors controlados (Cascade / Restrict)
+- Uso de DTOs para isolamento da camada de domínio
+- Isolamento de regras de negócio via camada de Services
+- AutoMapper para mapeamento entre camadas
 - Containerização completa com Docker Compose
-- Deploy em produção com OCI
+- Testes unitários com banco relacional em memória (SQLite)
+- Deploy em produção com a Oracle Cloud Infrastructure (OCI)
+- Conventional Commits
+
+---
+
+## 📦 Funcionalidades
+
+- **Gestão Multi-Empresa:** Isolamento de dados por organização.
+- **Autenticação JWT:** Controle de acesso seguro com validação de claims e lifetime.
+- **CRUD Corporativo:** Gestão completa de funcionários, departamentos e cargos.
+- **Segurança de Login:** Rate limiting integrado no endpoint de autenticação contra brute force.
+- **Documentação Viva:** Interface interativa gerada automaticamente via Scalar (`/scalar/v1`).
 
 ---
 
@@ -217,21 +236,6 @@ dotnet test
 
 ---
 
-## ⚙️ Destaques técnicos
-
-- Global Exception Handling via Middleware
-- Rate Limiting no endpoint de login contra brute force
-- JWT Authentication com validação de lifetime e claims
-- Containerização completa com Docker Compose
-- Constraints de banco (Unique Email)
-- Delete behaviors controlados (Cascade / Restrict)
-- Uso de DTOs para isolamento da camada de domínio
-- AutoMapper para mapeamento entre camadas
-- Testes unitários com banco relacional em memória (SQLite)
-- Isolamento de regras de negócio via camada de Services
-
----
-
 ## ▶️ Executando o projeto localmente
 
 1. Clonar o repositório
@@ -262,6 +266,8 @@ dotnet user-secrets list
 
 3. Rodar a aplicação
 
+O projeto está configurado para aplicar automaticamente todas as Migrations pendentes no banco de dados assim que inicializa. Basta executar:
+
 ```bash
 dotnet run
 ````
@@ -277,32 +283,6 @@ A API possui documentação interativa via **Scalar**:
 ```
 
 <img src="assets/scalar-ui.png" width="100%">
-
----
-
-## 🏗️ Decisões Técnicas
-
-- Uso de DTOs para evitar exposição direta das entidades
-- SQLite em memória nos testes para comportamento relacional real
-- Middleware global para padronização de respostas de erro
-- BCrypt para hash seguro de senhas
-- Docker Compose para isolamento completo do ambiente
-- Versionamento de commits seguindo Conventional Commits
-
----
-
-## 📁 Estrutura principal
-
-```bash
-Controllers/
-Services/
-DTOs/
-Entities/
-Data/
-Middleware/
-Mappings/
-Migrations/
-```
 
 ---
 
